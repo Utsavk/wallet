@@ -2,16 +2,16 @@ package controller
 
 import (
 	"wallet/service"
-
-	"github.com/valyala/fasthttp"
+	"wallet/wcontext"
 )
 
-func OnUserRequest(ctx *fasthttp.RequestCtx) {
+func OnUserRequest(ctx *wcontext.Context) {
 	userService := &service.User{}
-	if ctx.IsGet() {
+	fctx := ctx.Fctx
+	if fctx.IsGet() {
 		user := userService.GetUserDetailsByID("bd911361-e15f-443f-b71d-eea9cb5d5e9e")
-		ctx.Response.SetBody([]byte(user.ID))
+		fctx.Response.SetBody([]byte(user.ID))
 		return
 	}
-	ctx.Response.SetBody([]byte("method not allowed"))
+	fctx.Response.SetBody([]byte("method not allowed"))
 }
