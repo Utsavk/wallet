@@ -2,6 +2,12 @@ package middleware
 
 import "github.com/valyala/fasthttp"
 
-func VerifyAuth(ctx *fasthttp.RequestCtx) error {
+type AuthMwInterface interface {
+	VerifyAuth(ctx *fasthttp.RequestCtx) error
+}
+
+type AuthMw struct{}
+
+func (authmw *AuthMw) VerifyAuth(ctx *fasthttp.RequestCtx) error {
 	return nil
 }

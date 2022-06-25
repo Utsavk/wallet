@@ -6,19 +6,24 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type mw func(ctx *fasthttp.RequestCtx) error
+type mwFunc func(ctx *fasthttp.RequestCtx) error
 
-var pathMiddlewares = map[string][]mw{
+var authMw = AuthMw{}
+
+var pathMiddlewares = map[string][]mwFunc{
 	"user": {
-		VerifyAuth,
+		authMw.VerifyAuth,
 	},
 	"logout": {
-		VerifyAuth,
+		authMw.VerifyAuth,
 	},
 }
 
 func Filter(ctx *wcontext.Context) error {
-	// filters, found := pathMiddlewares[ctx.URI().String()]
+	filters := pathMiddlewares[ctx.Route]
 	// traverse through various middleware layers
+	for _, filterFn := range filters {
+		filterFn(ctx.Fctx)
+	}
 	return nil
 }
