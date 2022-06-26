@@ -20,7 +20,12 @@ func OnUserRequest(ctx *wcontext.Context) ([]byte, int) {
 			return []byte("invalid query args"), fasthttp.StatusBadRequest
 		}
 		user := userService.GetUserDetailsByID(id)
-		return []byte(strconv.Itoa(user.ID)), fasthttp.StatusOK
+		userBytes, err := json.Marshal(user)
+		if err != nil {
+			logs.Print(err.Error())
+			return []byte("server error"), fasthttp.StatusInternalServerError
+		}
+		return userBytes, fasthttp.StatusOK
 	}
 	if fctx.IsPost() {
 		var userArgs = service.NewUserArgs{}
@@ -37,7 +42,7 @@ func OnUserRequest(ctx *wcontext.Context) ([]byte, int) {
 			logs.Print(err.Error())
 			return []byte("server error"), fasthttp.StatusInternalServerError
 		}
-		return userBytes, fasthttp.StatusOK
+		return userBytes, fasthttp.StatusCreated
 	}
 	return []byte("method not allowed"), fasthttp.StatusMethodNotAllowed
 }

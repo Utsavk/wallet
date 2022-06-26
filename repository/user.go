@@ -14,21 +14,39 @@ import (
 const USER_TABLE = "user"
 
 func GetUserByID(id int) *models.User {
-	sql := fmt.Sprintf("SELECT * from %s where id=?", USER_TABLE)
-	results, err := mysql.Conn.DB.Query(sql, id)
+	sqlQuery := fmt.Sprintf("SELECT * from %s where id=?", USER_TABLE)
+	results, err := mysql.Conn.DB.Query(sqlQuery, id)
 	if err != nil {
 		logs.Print(err.Error())
 		return nil
 	}
-	var user models.User
+	var user = models.User{}
 
+	var role, updatedAt, createdBy, updatedBy sql.NullString
 	for results.Next() {
 
-		err = results.Scan(&user.ID)
+		err = results.Scan(
+			&user.UUID,
+			&user.Firstname,
+			&user.Lastname,
+			&user.Username,
+			&user.Password,
+			&user.IsActive,
+			&role,
+			&user.CreatedAt,
+			&updatedAt,
+			&createdBy,
+			&updatedBy,
+			&user.ID,
+		)
 		if err != nil {
 			logs.Print(err.Error())
 			continue
 		}
+		user.Role = &role.String
+		user.UpdatedAt = &updatedAt.String
+		user.CreatedBy = &createdBy.String
+		user.CreatedBy = &updatedBy.String
 	}
 	return &user
 }

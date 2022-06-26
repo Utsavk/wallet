@@ -9,4 +9,5 @@ func sendResponse(fctx *fasthttp.RequestCtx, code int, body []byte) {
 	if code != 0 {
 		fctx.SetStatusCode(code)
 	}
+	fctx.SetContentType("application/json")
 }

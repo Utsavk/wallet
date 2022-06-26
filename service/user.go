@@ -20,7 +20,6 @@ type User struct {
 	Firstname string
 	Lastname  string
 	Username  string
-	Password  string
 	IsActive  bool
 	Role      string
 }
@@ -39,6 +38,8 @@ func (u *UserService) GetUserDetailsByID(id int) *User {
 		UUID:      dbUser.UUID,
 		Firstname: dbUser.Firstname,
 		Lastname:  dbUser.Lastname,
+		IsActive:  dbUser.IsActive,
+		Role:      *dbUser.Role,
 	}
 }
 
