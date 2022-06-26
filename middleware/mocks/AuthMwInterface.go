@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	errors "wallet/errors"
+
 	fasthttp "github.com/valyala/fasthttp"
 
 	mock "github.com/stretchr/testify/mock"
@@ -14,14 +16,16 @@ type AuthMwInterface struct {
 }
 
 // VerifyAuth provides a mock function with given fields: ctx
-func (_m *AuthMwInterface) VerifyAuth(ctx *fasthttp.RequestCtx) error {
+func (_m *AuthMwInterface) VerifyAuth(ctx *fasthttp.RequestCtx) *errors.Err {
 	ret := _m.Called(ctx)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*fasthttp.RequestCtx) error); ok {
+	var r0 *errors.Err
+	if rf, ok := ret.Get(0).(func(*fasthttp.RequestCtx) *errors.Err); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*errors.Err)
+		}
 	}
 
 	return r0

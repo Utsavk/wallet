@@ -1,23 +1,21 @@
 package errors
 
-import "fmt"
+import (
+	"wallet/wcontext"
+)
 
 type Err struct {
 	OriginalError error
 	LogMessage    string
-	HttpMessage   string
-	HttpCode      int
 }
 
-func NewLogError(err error, logMessage string, httpMessage string, httpCode int) Err {
+func New() Err {
+	return Err{}
+}
+
+func NewError(err error, logMessage string, User *wcontext.UserInfo) Err {
 	return Err{
 		OriginalError: err,
-		LogMessage:    httpMessage,
-		HttpMessage:   httpMessage,
-		HttpCode:      httpCode,
+		LogMessage:    logMessage,
 	}
-}
-
-func (e *Err) Print() {
-	fmt.Println(e.LogMessage)
 }

@@ -1,17 +1,43 @@
 package controller
 
 import (
+	"encoding/json"
+	"strconv"
+	"wallet/logs"
 	"wallet/service"
 	"wallet/wcontext"
+
+	"github.com/valyala/fasthttp"
 )
 
-func OnUserRequest(ctx *wcontext.Context) {
-	userService := &service.User{}
+func OnUserRequest(ctx *wcontext.Context) ([]byte, int) {
+	userService := &service.UserService{}
 	fctx := ctx.Fctx
 	if fctx.IsGet() {
-		user := userService.GetUserDetailsByID("bd911361-e15f-443f-b71d-eea9cb5d5e9e")
-		fctx.Response.SetBody([]byte(user.ID))
-		return
+		id, err := strconv.Atoi(string(fctx.QueryArgs().Peek("id")))
+		if err != nil {
+			logs.Print(err.Error())
+			return []byte("invalid query args"), fasthttp.StatusBadRequest
+		}
+		user := userService.GetUserDetailsByID(id)
+		return []byte(strconv.Itoa(user.ID)), fasthttp.StatusOK
 	}
-	fctx.Response.SetBody([]byte("method not allowed"))
+	if fctx.IsPost() {
+		var userArgs = service.NewUserArgs{}
+		if err := json.Unmarshal(ctx.Fctx.PostBody(), &userArgs); err != nil {
+			logs.Print(err.Error())
+			return []byte("body could not be parsed"), fasthttp.StatusBadRequest
+		}
+		user := userService.CreateUser(userArgs)
+		if user == nil {
+			return []byte("user could not be created"), fasthttp.StatusBadRequest
+		}
+		userBytes, err := json.Marshal(user)
+		if err != nil {
+			logs.Print(err.Error())
+			return []byte("server error"), fasthttp.StatusInternalServerError
+		}
+		return userBytes, fasthttp.StatusOK
+	}
+	return []byte("method not allowed"), fasthttp.StatusMethodNotAllowed
 }

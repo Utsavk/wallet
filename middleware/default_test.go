@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"fmt"
 	"testing"
+	"wallet/errors"
 	"wallet/middleware/mocks"
 	"wallet/wcontext"
 
@@ -10,7 +12,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func getMockContext(uri string, route string) *wcontext.Context {
+func getMWTestMockContext(uri string, route string) *wcontext.Context {
 	fctx := &fasthttp.RequestCtx{
 		Request: fasthttp.Request{},
 	}
@@ -21,17 +23,83 @@ func getMockContext(uri string, route string) *wcontext.Context {
 	}
 }
 
-func TestFilter(t *testing.T) {
-	route := "user"
-	ctx := getMockContext("/v1/"+route, route)
-	authMw := mocks.AuthMwInterface{}
-	var originalRouteFnList = pathMiddlewares[route]
-	pathMiddlewares[route] = []mwFunc{
-		authMw.VerifyAuth,
+func TestFilter_ForVerifyAuth(t *testing.T) {
+	type args struct {
+		route string
 	}
-	authMw.On("VerifyAuth", mock.Anything).Return(nil)
-	gotErr := Filter(ctx)
-	assert.Equal(t, nil, gotErr)
-	pathMiddlewares[route] = originalRouteFnList
-	authMw.AssertNumberOfCalls(t, "VerifyAuth", 1)
+	type filterTest struct {
+		name                string
+		args                args
+		wantVerifyAuthCount int
+		err                 *errors.Err
+	}
+
+	testData := []filterTest{
+		{
+			name: "user route happy flow test",
+			args: args{
+				route: "/user",
+			},
+			wantVerifyAuthCount: 1,
+			err:                 nil,
+		},
+		{
+			name: "logout route happy flow test",
+			args: args{
+				route: "/logout",
+			},
+			wantVerifyAuthCount: 1,
+			err:                 nil,
+		},
+	}
+
+	for _, tdt := range testData {
+		fmt.Println(tdt.name)
+		route := tdt.args.route
+		ctx := getMWTestMockContext("/v1"+route, route)
+		authMw := mocks.AuthMwInterface{}
+		var originalRouteFnList = pathMiddlewares[route]
+		pathMiddlewares[route] = []mwFunc{
+			authMw.VerifyAuth,
+		}
+		authMw.On("VerifyAuth", mock.Anything).Return(nil)
+		gotErr := Filter(ctx)
+		assert.Equal(t, tdt.err, gotErr)
+		pathMiddlewares[route] = originalRouteFnList
+		authMw.AssertNumberOfCalls(t, "VerifyAuth", tdt.wantVerifyAuthCount)
+	}
+}
+
+func TestFilter_ForNoMW(t *testing.T) {
+	type args struct {
+		route string
+	}
+	type filterTest struct {
+		name                string
+		args                args
+		wantVerifyAuthCount int
+		err                 *errors.Err
+	}
+
+	testData := []filterTest{
+		{
+			name: "login route happy flow test",
+			args: args{
+				route: "/login",
+			},
+			wantVerifyAuthCount: 0,
+			err:                 nil,
+		},
+	}
+
+	for _, tdt := range testData {
+		fmt.Println(tdt.name)
+		route := tdt.args.route
+		ctx := getMWTestMockContext("/v1"+route, route)
+		authMw := mocks.AuthMwInterface{}
+		authMw.On("VerifyAuth", mock.Anything).Return(nil)
+		gotErr := Filter(ctx)
+		assert.Equal(t, tdt.err, gotErr)
+		authMw.AssertNumberOfCalls(t, "VerifyAuth", tdt.wantVerifyAuthCount)
+	}
 }
