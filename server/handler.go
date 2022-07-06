@@ -3,6 +3,7 @@ package server
 import (
 	"strings"
 	"wallet/controller"
+	"wallet/middleware"
 	"wallet/wcontext"
 
 	"github.com/valyala/fasthttp"
@@ -15,7 +16,7 @@ func requestHandler(fctx *fasthttp.RequestCtx) {
 		Fctx: fctx,
 	}
 	ctx.Route = string(fctx.RequestURI())
-	// middleware.Filter(ctx)
+	middleware.Filter(ctx)
 	if strings.HasPrefix(ctx.Route, "/user") {
 		body, status = controller.OnUserRequest(ctx)
 	}

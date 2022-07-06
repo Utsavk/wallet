@@ -26,6 +26,7 @@ func getVerifyAuthMockContext(token string) *wcontext.Context {
 
 func TestVerifyAuth(t *testing.T) {
 	testToken := "abcd"
+	testUserId := "testUser"
 
 	type args struct {
 		token         string
@@ -48,7 +49,8 @@ func TestVerifyAuth(t *testing.T) {
 				mockSessionFn: func(session *mocks.SessionRepoInterface) {
 					session.On("GetSessionByToken", testToken).Return(&models.Session{
 						Token:    testToken,
-						ExpiryAt: "",
+						ExpiryAt: "2050-01-02 00:00:00",
+						UserID:   testUserId,
 					}, nil)
 				},
 			},
@@ -60,12 +62,14 @@ func TestVerifyAuth(t *testing.T) {
 				mockSessionFn: func(session *mocks.SessionRepoInterface) {
 					session.On("GetSessionByToken", testToken).Return(&models.Session{
 						Token:    testToken,
-						ExpiryAt: "",
+						ExpiryAt: "1970-01-02 00:00:00",
+						UserID:   testUserId,
 					}, nil)
 				},
 			},
 			err: &errors.Err{
 				LogMessage: fmt.Sprintf("auth token %s is expired", testToken),
+				UserID:     testUserId,
 			},
 			getSessionFnCount: 1,
 		}, {
@@ -73,10 +77,7 @@ func TestVerifyAuth(t *testing.T) {
 			args: args{
 				token: "",
 				mockSessionFn: func(session *mocks.SessionRepoInterface) {
-					session.On("GetSessionByToken", mock.Anything).Return(&models.Session{
-						Token:    testToken,
-						ExpiryAt: "",
-					}, nil)
+					session.On("GetSessionByToken", mock.Anything).Return(&models.Session{}, nil)
 				},
 			},
 			err: &errors.Err{
