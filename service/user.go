@@ -15,7 +15,7 @@ type NewUserArgs struct {
 }
 
 type User struct {
-	ID        int
+	ID        uint
 	UUID      string
 	Firstname string
 	Lastname  string

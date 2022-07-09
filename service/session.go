@@ -36,10 +36,11 @@ func (s *SessionService) CreateSession(userID uint) (*Session, *errors.Err) {
 		return nil, err
 	}
 	return &Session{
-		ID:     session.ID,
-		UUID:   session.UUID,
-		Token:  session.Token,
-		UserID: session.UserID,
+		ID:       session.ID,
+		UUID:     session.UUID,
+		Token:    session.Token,
+		UserID:   session.UserID,
+		ExpiryAt: session.ExpiryAt,
 	}, nil
 }
 

@@ -53,7 +53,7 @@ func GetUserByID(id int) *models.User {
 
 func CreateUser(user *models.User) *models.User {
 	uuid, _ := uuid.NewUUID()
-	user.CreatedAt = utils.GetCurrentTime()
+	user.CreatedAt = utils.ClockObj.GetCurrentTime()
 
 	sqlQuery := `INSERT INTO ` + USER_TABLE + `(
 		uuid, 

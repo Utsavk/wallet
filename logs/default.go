@@ -6,7 +6,7 @@ import (
 	"wallet/wcontext"
 )
 
-func Print(message string) {
+func Print(message interface{}) {
 	PrintDetail(message, nil)
 }
 

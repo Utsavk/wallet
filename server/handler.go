@@ -19,6 +19,8 @@ func requestHandler(fctx *fasthttp.RequestCtx) {
 	middleware.Filter(ctx)
 	if strings.HasPrefix(ctx.Route, "/user") {
 		body, status = controller.OnUserRequest(ctx)
+	} else if strings.HasPrefix(ctx.Route, "/login") {
+		body, status = controller.OnLoginRequest(ctx)
 	}
 	sendResponse(fctx, status, body)
 }

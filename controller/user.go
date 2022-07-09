@@ -31,7 +31,7 @@ func OnUserRequest(ctx *wcontext.Context) ([]byte, int) {
 		var userArgs = service.NewUserArgs{}
 		if err := json.Unmarshal(ctx.Fctx.PostBody(), &userArgs); err != nil {
 			logs.Print(err.Error())
-			return []byte("body could not be parsed"), fasthttp.StatusBadRequest
+			return []byte("create user request body could not be parsed"), fasthttp.StatusBadRequest
 		}
 		user := userService.CreateUser(userArgs)
 		if user == nil {
