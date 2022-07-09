@@ -7,7 +7,7 @@ import (
 type Err struct {
 	OriginalError error
 	LogMessage    string
-	UserID        string
+	UserID        uint
 }
 
 func New() *Err {

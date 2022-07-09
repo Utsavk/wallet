@@ -26,7 +26,7 @@ func getVerifyAuthMockContext(token string) *wcontext.Context {
 
 func TestVerifyAuth(t *testing.T) {
 	testToken := "abcd"
-	testUserId := "testUser"
+	var testUserId uint = 1
 
 	type args struct {
 		token         string

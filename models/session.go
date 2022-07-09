@@ -1,10 +1,10 @@
 package models
 
 type Session struct {
-	ID         int
+	ID         uint
 	UUID       string
 	Token      string
-	UserID     string
+	UserID     uint
 	LastActive string
 	ExpiryAt   string
 	CreatedAt  string

@@ -24,7 +24,7 @@ func (authmw *AuthMw) VerifyAuth(ctx *fasthttp.RequestCtx) *err.Err {
 	if token == "" {
 		return err.NewError(nil, "auth token is not provided", nil)
 	}
-	session, err1 := authmw.sessionRepo.GetSessionByToken(token)
+	session, err1 := authmw.sessionRepo.GetDBSessionByToken(token)
 	expiryDate, _ := time.Parse("2006-01-02 15:04:05", session.ExpiryAt)
 	if time.Now().After(expiryDate) {
 		return err.NewError(nil, fmt.Sprintf("auth token %s is expired", token), &wcontext.UserInfo{ID: session.UserID})

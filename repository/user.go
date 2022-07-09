@@ -3,10 +3,10 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"time"
 	"wallet/db/mysql"
 	"wallet/logs"
 	"wallet/models"
+	"wallet/utils"
 
 	"github.com/google/uuid"
 )
@@ -53,7 +53,7 @@ func GetUserByID(id int) *models.User {
 
 func CreateUser(user *models.User) *models.User {
 	uuid, _ := uuid.NewUUID()
-	user.CreatedAt = time.Now().Format("2006/01/02 15:04:05")
+	user.CreatedAt = utils.GetCurrentTime()
 
 	sqlQuery := `INSERT INTO ` + USER_TABLE + `(
 		uuid, 

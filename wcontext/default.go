@@ -3,7 +3,7 @@ package wcontext
 import "github.com/valyala/fasthttp"
 
 type UserInfo struct {
-	ID string
+	ID uint
 }
 
 type Context struct {

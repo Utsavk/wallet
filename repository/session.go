@@ -6,12 +6,36 @@ import (
 )
 
 type SessionRepoInterface interface {
-	GetSessionByToken(token string) (*models.Session, *errors.Err)
+	GetDBSessionByToken(token string) (*models.Session, *errors.Err)
+	CreateDBSession(userID uint) (*models.Session, *errors.Err)
+	UpdateDBSessionByID(id uint) (*models.Session, *errors.Err)
+	DeleteDBSessionByID(id uint) *errors.Err
+	GetDBSessionByID(id uint) (*models.Session, *errors.Err)
+	GetDBSessionByUserID(userID uint) (*models.Session, *errors.Err)
 }
 
-type SessionRepo struct {
+type SessionRepo struct{}
+
+func (s *SessionRepo) GetDBSessionByToken(token string) (*models.Session, *errors.Err) {
+	return &models.Session{}, nil
 }
 
-func (s *SessionRepo) GetSessionByToken(token string) (*models.Session, *errors.Err) {
+func (s *SessionRepo) CreateDBSession(userID uint) (*models.Session, *errors.Err) {
+	return &models.Session{}, nil
+}
+
+func (s *SessionRepo) UpdateDBSessionByID(id uint) (*models.Session, *errors.Err) {
+	return &models.Session{}, nil
+}
+
+func (s *SessionRepo) DeleteDBSessionByID(id uint) *errors.Err {
+	return nil
+}
+
+func (s *SessionRepo) GetDBSessionByID(id uint) (*models.Session, *errors.Err) {
+	return &models.Session{}, nil
+}
+
+func (s *SessionRepo) GetDBSessionByUserID(userID uint) (*models.Session, *errors.Err) {
 	return &models.Session{}, nil
 }

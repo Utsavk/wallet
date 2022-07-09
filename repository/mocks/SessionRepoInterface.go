@@ -14,8 +14,74 @@ type SessionRepoInterface struct {
 	mock.Mock
 }
 
-// GetSessionByToken provides a mock function with given fields: token
-func (_m *SessionRepoInterface) GetSessionByToken(token string) (*models.Session, *errors.Err) {
+// CreateDBSession provides a mock function with given fields: userID
+func (_m *SessionRepoInterface) CreateDBSession(userID uint) (*models.Session, *errors.Err) {
+	ret := _m.Called(userID)
+
+	var r0 *models.Session
+	if rf, ok := ret.Get(0).(func(uint) *models.Session); ok {
+		r0 = rf(userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Session)
+		}
+	}
+
+	var r1 *errors.Err
+	if rf, ok := ret.Get(1).(func(uint) *errors.Err); ok {
+		r1 = rf(userID)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errors.Err)
+		}
+	}
+
+	return r0, r1
+}
+
+// DeleteDBSessionByID provides a mock function with given fields: id
+func (_m *SessionRepoInterface) DeleteDBSessionByID(id uint) *errors.Err {
+	ret := _m.Called(id)
+
+	var r0 *errors.Err
+	if rf, ok := ret.Get(0).(func(uint) *errors.Err); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*errors.Err)
+		}
+	}
+
+	return r0
+}
+
+// GetDBSessionByID provides a mock function with given fields: id
+func (_m *SessionRepoInterface) GetDBSessionByID(id uint) (*models.Session, *errors.Err) {
+	ret := _m.Called(id)
+
+	var r0 *models.Session
+	if rf, ok := ret.Get(0).(func(uint) *models.Session); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Session)
+		}
+	}
+
+	var r1 *errors.Err
+	if rf, ok := ret.Get(1).(func(uint) *errors.Err); ok {
+		r1 = rf(id)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errors.Err)
+		}
+	}
+
+	return r0, r1
+}
+
+// GetDBSessionByToken provides a mock function with given fields: token
+func (_m *SessionRepoInterface) GetDBSessionByToken(token string) (*models.Session, *errors.Err) {
 	ret := _m.Called(token)
 
 	var r0 *models.Session
@@ -30,6 +96,56 @@ func (_m *SessionRepoInterface) GetSessionByToken(token string) (*models.Session
 	var r1 *errors.Err
 	if rf, ok := ret.Get(1).(func(string) *errors.Err); ok {
 		r1 = rf(token)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errors.Err)
+		}
+	}
+
+	return r0, r1
+}
+
+// GetDBSessionByUserID provides a mock function with given fields: userID
+func (_m *SessionRepoInterface) GetDBSessionByUserID(userID uint) (*models.Session, *errors.Err) {
+	ret := _m.Called(userID)
+
+	var r0 *models.Session
+	if rf, ok := ret.Get(0).(func(uint) *models.Session); ok {
+		r0 = rf(userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Session)
+		}
+	}
+
+	var r1 *errors.Err
+	if rf, ok := ret.Get(1).(func(uint) *errors.Err); ok {
+		r1 = rf(userID)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*errors.Err)
+		}
+	}
+
+	return r0, r1
+}
+
+// UpdateDBSessionByID provides a mock function with given fields: id
+func (_m *SessionRepoInterface) UpdateDBSessionByID(id uint) (*models.Session, *errors.Err) {
+	ret := _m.Called(id)
+
+	var r0 *models.Session
+	if rf, ok := ret.Get(0).(func(uint) *models.Session); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Session)
+		}
+	}
+
+	var r1 *errors.Err
+	if rf, ok := ret.Get(1).(func(uint) *errors.Err); ok {
+		r1 = rf(id)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*errors.Err)
