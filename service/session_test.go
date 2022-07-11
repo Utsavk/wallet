@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"wallet/context"
 	"wallet/errors"
 	"wallet/models"
 	repoMocks "wallet/repository/mocks"
@@ -9,6 +10,7 @@ import (
 	utilsMocks "wallet/utils/mocks"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateSession(t *testing.T) {
@@ -25,6 +27,7 @@ func TestCreateSession(t *testing.T) {
 		err                   *errors.Err
 		expected              *Session
 		createSessionNumCalls int
+		getSessionNumCalls    int
 		wantErr               bool
 	}
 
@@ -40,7 +43,8 @@ func TestCreateSession(t *testing.T) {
 				userID: testUserId,
 				mockFn: func() *repoMocks.SessionRepoInterface {
 					sessionRepoMock := &repoMocks.SessionRepoInterface{}
-					sessionRepoMock.On("CreateDBSession", testUserId).Return(&models.Session{
+					sessionRepoMock.On("CreateDBSession", mock.Anything, testUserId).Return(int64(testUserId), nil)
+					sessionRepoMock.On("GetDBSessionByUserID", mock.Anything, testUserId).Return(&models.Session{
 						ID:        1,
 						UUID:      "testuuid",
 						UserID:    testUserId,
@@ -60,6 +64,7 @@ func TestCreateSession(t *testing.T) {
 				ExpiryAt: dummyCurrentTime,
 			},
 			createSessionNumCalls: 1,
+			getSessionNumCalls:    1,
 			wantErr:               false,
 		},
 		{
@@ -73,15 +78,17 @@ func TestCreateSession(t *testing.T) {
 			err:                   errors.NewError(nil, "invalid userid", nil),
 			expected:              nil,
 			createSessionNumCalls: 0,
+			getSessionNumCalls:    0,
 			wantErr:               true,
 		},
 	}
 
+	mockContext := context.GetMockContext(nil, nil)
 	for _, tt := range data {
 		sessionService := &SessionService{}
 		sessionRepoMock := tt.args.mockFn()
 		sessionService.sessionRepo = sessionRepoMock
-		actualSession, actualErr := sessionService.CreateSession(tt.args.userID)
+		actualSession, actualErr := sessionService.CreateSession(mockContext, tt.args.userID)
 		assert.EqualValues(t, tt.err, actualErr)
 		if !tt.wantErr {
 			assert.Equal(t, tt.expected.Token, actualSession.Token)
@@ -90,8 +97,10 @@ func TestCreateSession(t *testing.T) {
 			assert.Equal(t, tt.expected.UserID, actualSession.UserID)
 			assert.Equal(t, tt.expected.ExpiryAt, actualSession.ExpiryAt)
 			assert.True(t, sessionRepoMock.AssertNumberOfCalls(t, "CreateDBSession", tt.createSessionNumCalls))
+			assert.True(t, sessionRepoMock.AssertNumberOfCalls(t, "GetDBSessionByUserID", tt.getSessionNumCalls))
 		} else {
-			assert.Nil(t, actualErr)
+			assert.NotNil(t, actualErr)
+			assert.EqualValues(t, tt.err, actualErr)
 		}
 	}
 	utils.ClockObj = genuineClockObj

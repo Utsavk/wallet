@@ -2,9 +2,9 @@ package server
 
 import (
 	"strings"
+	"wallet/context"
 	"wallet/controller"
 	"wallet/middleware"
-	"wallet/wcontext"
 
 	"github.com/valyala/fasthttp"
 )
@@ -12,7 +12,7 @@ import (
 func requestHandler(fctx *fasthttp.RequestCtx) {
 	var body = []byte("page not found")
 	var status int = fasthttp.StatusNotFound
-	ctx := &wcontext.Context{
+	ctx := &context.Ctx{
 		Fctx: fctx,
 	}
 	ctx.Route = string(fctx.RequestURI())

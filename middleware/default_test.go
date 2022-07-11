@@ -3,21 +3,21 @@ package middleware
 import (
 	"fmt"
 	"testing"
+	"wallet/context"
 	"wallet/errors"
 	"wallet/middleware/mocks"
-	"wallet/wcontext"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/valyala/fasthttp"
 )
 
-func getMWTestMockContext(uri string, route string) *wcontext.Context {
+func getMWTestMockContext(uri string, route string) *context.Ctx {
 	fctx := &fasthttp.RequestCtx{
 		Request: fasthttp.Request{},
 	}
 	fctx.Request.SetRequestURI(uri)
-	return &wcontext.Context{
+	return &context.Ctx{
 		Fctx:  fctx,
 		Route: route,
 	}

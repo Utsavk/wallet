@@ -1,5 +1,7 @@
 package models
 
+const USER_TABLE = "user"
+
 type User struct {
 	ID        uint
 	UUID      string

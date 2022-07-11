@@ -2,14 +2,14 @@ package controller
 
 import (
 	"encoding/json"
+	"wallet/context"
 	"wallet/logs"
 	"wallet/service"
-	"wallet/wcontext"
 
 	"github.com/valyala/fasthttp"
 )
 
-func OnLoginRequest(ctx *wcontext.Context) ([]byte, int) {
+func OnLoginRequest(ctx *context.Ctx) ([]byte, int) {
 	fctx := ctx.Fctx
 	var loginService = &service.LoginService{}
 	if fctx.IsPost() {

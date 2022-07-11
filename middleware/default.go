@@ -1,13 +1,11 @@
 package middleware
 
 import (
+	"wallet/context"
 	"wallet/errors"
-	"wallet/wcontext"
-
-	"github.com/valyala/fasthttp"
 )
 
-type mwFunc func(ctx *fasthttp.RequestCtx) *errors.Err
+type mwFunc func(ctx *context.Ctx) *errors.Err
 
 var authMw = AuthMw{}
 
@@ -20,11 +18,11 @@ var pathMiddlewares = map[string][]mwFunc{
 	},
 }
 
-func Filter(ctx *wcontext.Context) *errors.Err {
+func Filter(ctx *context.Ctx) *errors.Err {
 	filters := pathMiddlewares[ctx.Route]
 	// traverse through various middleware layers
 	for _, filterFn := range filters {
-		filterFn(ctx.Fctx)
+		filterFn(ctx)
 	}
 	return nil
 }

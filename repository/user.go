@@ -3,7 +3,9 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"wallet/context"
 	"wallet/db/mysql"
+	"wallet/errors"
 	"wallet/logs"
 	"wallet/models"
 	"wallet/utils"
@@ -11,10 +13,24 @@ import (
 	"github.com/google/uuid"
 )
 
-const USER_TABLE = "user"
+type UserRepoInterface interface {
+	GetDBUserByID(ctx *context.Ctx, id int) (*models.User, *errors.Err)
+	CreateDBUser(ctx *context.Ctx, userInput *CreateUserInputData) (int64, *errors.Err)
+}
 
-func GetUserByID(id int) *models.User {
-	sqlQuery := fmt.Sprintf("SELECT * from %s where id=?", USER_TABLE)
+type CreateUserInputData struct {
+	Firstname string
+	Lastname  string
+	Username  string
+	Password  string
+	IsActive  bool
+	Role      *string
+}
+
+type UserRepo struct{}
+
+func (u *UserRepo) GetDBUserByID(ctx context.Ctx, id int) *models.User {
+	sqlQuery := fmt.Sprintf("SELECT * from %s where id=?", models.USER_TABLE)
 	results, err := mysql.Conn.DB.Query(sqlQuery, id)
 	if err != nil {
 		logs.Print(err.Error())
@@ -51,11 +67,20 @@ func GetUserByID(id int) *models.User {
 	return &user
 }
 
-func CreateUser(user *models.User) *models.User {
+func (u *UserRepo) CreateDBUser(ctx context.Ctx, userInput *CreateUserInputData) (int64, *errors.Err) {
 	uuid, _ := uuid.NewUUID()
+	user := &models.User{
+		Firstname: userInput.Firstname,
+		Lastname:  userInput.Lastname,
+		Username:  userInput.Username,
+		Password:  userInput.Password,
+		IsActive:  userInput.IsActive,
+		Role:      userInput.Role,
+	}
+
 	user.CreatedAt = utils.ClockObj.GetCurrentTime()
 
-	sqlQuery := `INSERT INTO ` + USER_TABLE + `(
+	sqlQuery := `INSERT INTO ` + models.USER_TABLE + `(
 		uuid, 
 		firstname, 
 		lastname,
@@ -98,15 +123,13 @@ func CreateUser(user *models.User) *models.User {
 	)
 
 	if err != nil {
-		logs.Print(err.Error())
-		return nil
+		return -1, errors.NewError(err, fmt.Sprintf("error in creating new user %s", user.Username), ctx.User)
 	}
 
 	lastId, err := results.LastInsertId()
 	if err != nil {
-		logs.Print(err.Error())
-		return nil
+		return -1, errors.NewError(err, fmt.Sprintf("error in creating new user %s", user.Username), ctx.User)
 	}
 
-	return GetUserByID(int(lastId))
+	return lastId, nil
 }

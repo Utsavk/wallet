@@ -1,7 +1,8 @@
 package service
 
 import (
-	"wallet/models"
+	"wallet/context"
+	"wallet/errors"
 	"wallet/repository"
 )
 
@@ -25,14 +26,20 @@ type User struct {
 }
 
 type UserServiceInterface interface {
-	GetUserDetailsByID(id string) *models.User
-	CreateUser(args NewUserArgs)
+	repository.UserRepoInterface
+	GetUserDetailsByID(ctx *context.Ctx, id string) (*User, *errors.Err)
+	CreateUser(ctx *context.Ctx, args NewUserArgs) (int64, *errors.Err)
 }
 
-type UserService struct{}
+type UserService struct {
+	userRepo repository.UserRepoInterface
+}
 
-func (u *UserService) GetUserDetailsByID(id int) *User {
-	dbUser := repository.GetUserByID(id)
+func (u *UserService) GetUserDetailsByID(ctx *context.Ctx, id int) (*User, *errors.Err) {
+	dbUser, err := u.userRepo.GetDBUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	return &User{
 		ID:        dbUser.ID,
 		UUID:      dbUser.UUID,
@@ -40,11 +47,11 @@ func (u *UserService) GetUserDetailsByID(id int) *User {
 		Lastname:  dbUser.Lastname,
 		IsActive:  dbUser.IsActive,
 		Role:      *dbUser.Role,
-	}
+	}, nil
 }
 
-func (u *UserService) CreateUser(args NewUserArgs) *User {
-	dbUser := repository.CreateUser(&models.User{
+func (u *UserService) CreateUser(ctx *context.Ctx, args NewUserArgs) (int64, *errors.Err) {
+	newUserId, err := u.userRepo.CreateDBUser(ctx, &repository.CreateUserInputData{
 		Firstname: args.Firstname,
 		Lastname:  args.Lastname,
 		Username:  args.Username,
@@ -52,13 +59,8 @@ func (u *UserService) CreateUser(args NewUserArgs) *User {
 		IsActive:  args.IsActive,
 		Role:      &args.Role,
 	})
-	if dbUser == nil {
-		return nil
+	if err != nil {
+		return -1, err
 	}
-	return &User{
-		ID:        dbUser.ID,
-		UUID:      dbUser.UUID,
-		Firstname: dbUser.Firstname,
-		Lastname:  dbUser.Lastname,
-	}
+	return newUserId, nil
 }

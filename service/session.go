@@ -1,6 +1,7 @@
 package service
 
 import (
+	"wallet/context"
 	"wallet/errors"
 	"wallet/repository"
 )
@@ -16,22 +17,26 @@ type Session struct {
 
 type SessionServiceInterface interface {
 	repository.SessionRepoInterface
-	CreateSession(userID uint) (*Session, *errors.Err)
-	UpdateSessionByID(id uint) (*Session, *errors.Err)
-	DeleteSessionByID(id uint) *errors.Err
-	GetSessionByID(id uint) (*Session, *errors.Err)
-	GetSessionByUserID(userID uint) (*Session, *errors.Err)
+	CreateSession(ctx *context.Ctx, userID uint) (*Session, *errors.Err)
+	UpdateSessionByID(ctx *context.Ctx, id uint) (*Session, *errors.Err)
+	DeleteSessionByID(ctx *context.Ctx, id uint) *errors.Err
+	GetSessionByID(ctx *context.Ctx, id uint) (*Session, *errors.Err)
+	GetSessionByUserID(ctx *context.Ctx, userID uint) (*Session, *errors.Err)
 }
 
 type SessionService struct {
 	sessionRepo repository.SessionRepoInterface
 }
 
-func (s *SessionService) CreateSession(userID uint) (*Session, *errors.Err) {
+func (s *SessionService) CreateSession(ctx *context.Ctx, userID uint) (*Session, *errors.Err) {
 	if userID == 0 {
 		return nil, errors.NewError(nil, "invalid userid", nil)
 	}
-	session, err := s.sessionRepo.CreateDBSession(userID)
+	_, err := s.sessionRepo.CreateDBSession(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	session, err := s.sessionRepo.GetDBSessionByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,22 +49,22 @@ func (s *SessionService) CreateSession(userID uint) (*Session, *errors.Err) {
 	}, nil
 }
 
-func (s *SessionService) UpdateSessionByID(id uint) (*Session, *errors.Err) {
+func (s *SessionService) UpdateSessionByID(ctx *context.Ctx, id uint) (*Session, *errors.Err) {
 	return &Session{}, nil
 }
 
-func (s *SessionService) DeleteSessionByID(id uint) *errors.Err {
+func (s *SessionService) DeleteSessionByID(ctx *context.Ctx, id uint) *errors.Err {
 	return nil
 }
 
-func (s *SessionService) GetSessionByID(id uint) (*Session, *errors.Err) {
+func (s *SessionService) GetSessionByID(ctx *context.Ctx, id uint) (*Session, *errors.Err) {
 	return &Session{}, nil
 }
 
-func (s *SessionService) GetSessionByUserID(userID string) (*Session, *errors.Err) {
+func (s *SessionService) GetSessionByUserID(ctx *context.Ctx, userID string) (*Session, *errors.Err) {
 	return &Session{}, nil
 }
 
-func (s *SessionService) GetSessionByToken(token string) (*Session, *errors.Err) {
+func (s *SessionService) GetSessionByToken(ctx *context.Ctx, token string) (*Session, *errors.Err) {
 	return &Session{}, nil
 }

@@ -3,25 +3,23 @@ package middleware
 import (
 	"fmt"
 	"testing"
+	"wallet/context"
 	"wallet/errors"
 	"wallet/logs"
 	"wallet/models"
 	"wallet/repository/mocks"
-	"wallet/wcontext"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/valyala/fasthttp"
 )
 
-func getVerifyAuthMockContext(token string) *wcontext.Context {
+func getVerifyAuthMockContext(token string) *context.Ctx {
 	fctx := &fasthttp.RequestCtx{
 		Request: fasthttp.Request{},
 	}
 	fctx.Request.Header.Add("Authorization", token)
-	return &wcontext.Context{
-		Fctx: fctx,
-	}
+	return context.GetMockContext(fctx, nil)
 }
 
 func TestVerifyAuth(t *testing.T) {
@@ -95,7 +93,7 @@ func TestVerifyAuth(t *testing.T) {
 		}
 		mockCtx := getVerifyAuthMockContext(tt.args.token)
 		tt.args.mockSessionFn(mockSession)
-		gotErr := authMw.VerifyAuth(mockCtx.Fctx)
+		gotErr := authMw.VerifyAuth(mockCtx)
 		assert.Equal(t, tt.err, gotErr)
 		mockSession.AssertNumberOfCalls(t, "GetSessionByToken", tt.getSessionFnCount)
 	}
