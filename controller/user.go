@@ -6,13 +6,16 @@ import (
 	"strconv"
 	"wallet/context"
 	"wallet/logs"
+	"wallet/repository"
 	"wallet/service"
 
 	"github.com/valyala/fasthttp"
 )
 
 func OnUserRequest(ctx *context.Ctx) ([]byte, int) {
-	userService := &service.UserService{}
+	userService := &service.UserService{
+		UserRepo: &repository.UserRepo{},
+	}
 	fctx := ctx.Fctx
 	if fctx.IsGet() {
 		id, err := strconv.Atoi(string(fctx.QueryArgs().Peek("id")))

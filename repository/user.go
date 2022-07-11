@@ -6,7 +6,6 @@ import (
 	"wallet/context"
 	"wallet/db/mysql"
 	"wallet/errors"
-	"wallet/logs"
 	"wallet/models"
 	"wallet/utils"
 
@@ -29,12 +28,11 @@ type CreateUserInputData struct {
 
 type UserRepo struct{}
 
-func (u *UserRepo) GetDBUserByID(ctx context.Ctx, id int) *models.User {
+func (u *UserRepo) GetDBUserByID(ctx *context.Ctx, id int) (*models.User, *errors.Err) {
 	sqlQuery := fmt.Sprintf("SELECT * from %s where id=?", models.USER_TABLE)
 	results, err := mysql.Conn.DB.Query(sqlQuery, id)
 	if err != nil {
-		logs.Print(err.Error())
-		return nil
+		return nil, errors.NewError(err, fmt.Sprintf("user with id %d could not be fetched", id), ctx.User)
 	}
 	var user = models.User{}
 
@@ -56,18 +54,17 @@ func (u *UserRepo) GetDBUserByID(ctx context.Ctx, id int) *models.User {
 			&user.ID,
 		)
 		if err != nil {
-			logs.Print(err.Error())
-			continue
+			return nil, errors.NewError(err, fmt.Sprintf("user with id %d could not be fetched", id), ctx.User)
 		}
 		user.Role = &role.String
 		user.UpdatedAt = &updatedAt.String
 		user.CreatedBy = &createdBy.String
 		user.CreatedBy = &updatedBy.String
 	}
-	return &user
+	return &user, nil
 }
 
-func (u *UserRepo) CreateDBUser(ctx context.Ctx, userInput *CreateUserInputData) (int64, *errors.Err) {
+func (u *UserRepo) CreateDBUser(ctx *context.Ctx, userInput *CreateUserInputData) (int64, *errors.Err) {
 	uuid, _ := uuid.NewUUID()
 	user := &models.User{
 		Firstname: userInput.Firstname,

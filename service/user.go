@@ -22,7 +22,7 @@ type User struct {
 	Lastname  string
 	Username  string
 	IsActive  bool
-	Role      string
+	Role      *string
 }
 
 type UserServiceInterface interface {
@@ -32,11 +32,11 @@ type UserServiceInterface interface {
 }
 
 type UserService struct {
-	userRepo repository.UserRepoInterface
+	UserRepo repository.UserRepoInterface
 }
 
 func (u *UserService) GetUserDetailsByID(ctx *context.Ctx, id int) (*User, *errors.Err) {
-	dbUser, err := u.userRepo.GetDBUserByID(ctx, id)
+	dbUser, err := u.UserRepo.GetDBUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,12 +46,12 @@ func (u *UserService) GetUserDetailsByID(ctx *context.Ctx, id int) (*User, *erro
 		Firstname: dbUser.Firstname,
 		Lastname:  dbUser.Lastname,
 		IsActive:  dbUser.IsActive,
-		Role:      *dbUser.Role,
+		Role:      dbUser.Role,
 	}, nil
 }
 
 func (u *UserService) CreateUser(ctx *context.Ctx, args NewUserArgs) (int64, *errors.Err) {
-	newUserId, err := u.userRepo.CreateDBUser(ctx, &repository.CreateUserInputData{
+	newUserId, err := u.UserRepo.CreateDBUser(ctx, &repository.CreateUserInputData{
 		Firstname: args.Firstname,
 		Lastname:  args.Lastname,
 		Username:  args.Username,
